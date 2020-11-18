@@ -215,15 +215,18 @@ The table above is an interactive datatable which shows the total count of cases
 <br>
 
 
-# IV. Conclusion
+# III. Conclusion
 -The number of cases in each area in Los Angeles in 2019 seems to be less than that in 2010.
--Subject age seems to be affected by arrest type, although there are some overlaps.
--Males tend to be older than females.
--Subject age seems to be different in different patrol divisions.
+<br>
+-Subject age seems to be affected by arrest type although there are overlap.
+<br>
+-Males tend to be older than females in most of arrest type.
+<br>
+-Subject age seems to be different in different patrol divisions location.
 
 <br>
 
-# III. Link to the PDF version of the report 
+# IV. Link to the PDF version of the report 
 
 https://github.com/jiqingwu1997/PM566_Final/raw/main/report%20.pdf
 
