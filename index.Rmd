@@ -52,7 +52,7 @@ dbWriteTable(con, "Arrest2019", Arrest2019)
 
 # I. Brief Description 
 
-In this project, I used the dataset which reflects arrest incidents in the City of Los Angeles from 2010 to 2019. There are 1,320,000 rows in this dataset, each row represents an arrest. The analysis is trying to figure out whether there is a difference between the number of arrest incidents in the City of Los Angeles from 2010 to 2019 and whether there are any relationship between subject age and sex, area, time and arrest type in the arrest situation in 2019. The graphs below focus on five main variables which represent subject age, subject sex, patrol divisions location, arrested time and the type of charge the individual was arrested for repectively.
+In this project, I used the dataset which reflects arrest incidents in the City of Los Angeles from 2010 to 2019. There are 1,320,000 rows in this dataset, each row represents an arrest. The analysis is trying to figure out whether there is a difference between the number of arrest incidents in the City of Los Angeles from 2010 to 2019 and whether there are any relationship between subject age and sex, area, time and arrest type in the arrest situation in 2019. The graphs below focus on five main variables which represent subject age, subject sex, patrol divisions location and the type of charge the individual was arrested for repectively.
 
 <br>
 
@@ -211,6 +211,15 @@ datatable(table1)
 ```
 
 The table above is an interactive datatable which shows the total count of cases grouped by arrest date, arrest time, patrol divisions location, arrest type and sex.
+
+<br>
+
+
+# IV. Conclusion
+-The number of cases in each area in Los Angeles in 2019 seems to be less than that in 2010.
+-Subject age seems to be affected by arrest type, although there are some overlaps.
+-Males tend to be older than females.
+-Subject age seems to be different in different patrol divisions.
 
 <br>
 
