@@ -1,7 +1,7 @@
 ---
-title: "PM566 Final Project"
+title: "Arrest Cases Situation in the City of Los Angeles in 2010 and 2019"
 author: "Jiqing Wu"
-output: 
+output:
     html_document:
         toc: TRUE
         toc_float: TRUE
@@ -15,7 +15,7 @@ This is my PM566 final project.
 
 ```{r setup, message=FALSE, echo=FALSE, warning=FALSE}
 knitr::opts_chunk$set(include  = TRUE)
-#install.packages("sqldf")
+
 library(sqldf)
 library(ggplot2)
 library(tidyr)
@@ -27,32 +27,28 @@ library(dtplyr)
 library(plotly)
 library(knitr)
 library(DT)
-# install.packages(c("RSQLite", "DBI"))
+library(leaflet)
 library(RSQLite)
 library(DBI)
-# Initialize a temporary in memory database
+library(knitr)
 con <- dbConnect(SQLite(), ":memory:")
-opts_chunk$set(
-  warning = FALSE,
-  message = FALSE,
-  eval=TRUE,
-  echo = TRUE,
-  fig.width = 7, 
-  fig.align = 'center',
-  fig.asp = 0.618,
-  out.width = "700px")
+
 load("/Users/jiqingwu/Desktop/566 Introduction to Health Data Science/midterm/Arrest2010.rda")
 load("/Users/jiqingwu/Desktop/566 Introduction to Health Data Science/midterm/Arrest2019.rda")
 
-dbWriteTable(con, "Arrest2010", Arrest2010)
-dbWriteTable(con, "Arrest2019", Arrest2019)
+#dbWriteTable(con, "Arrest2010", Arrest2010)
+#dbWriteTable(con, "Arrest2019", Arrest2019)
 ```
 
 <br>
 
 # I. Brief Description 
 
-In this project, I used the dataset which reflects arrest incidents in the City of Los Angeles from 2010 to 2019. There are 1,320,000 rows in this dataset, each row represents an arrest. The analysis is trying to figure out whether there is a difference between the number of arrest incidents in the City of Los Angeles from 2010 to 2019 and whether there are any relationship between subject age and sex, area, time and arrest type in the arrest situation in 2019. The graphs below focus on five main variables which represent subject age, subject sex, patrol divisions location and the type of charge the individual was arrested for repectively.
+In this project, I used the dataset which reflects arrest incidents in the City of Los Angeles from 2010 to 2019. There are 1,320,000 rows in this dataset, each row represents an arrest. 
+The analysis is trying to figure out two questions:
+-Whether there is a difference between the number of arrest incidents in the City of Los Angeles between 2010 and 2019 
+-Whether there are any relationship between subject age and sex, patrol divisions area, arrested time and arrest type in the arrest situation in 2019. 
+The graphs below focus on the main variables which represent subject age, subject sex, patrol divisions location and the type of charge the individual was arrested for repectively.
 
 <br>
 
@@ -60,7 +56,7 @@ In this project, I used the dataset which reflects arrest incidents in the City 
 
 # II. Interactive Visualizations 
 
-```{r echo=FALSE}
+```{r message=FALSE, echo=FALSE, warning=FALSE}
 data1<-sqldf(
 'SELECT "Arrest.Type", "Area.Name",
   AVG(Age) AS avg_Age,
@@ -69,7 +65,7 @@ FROM Arrest2019
 GROUP BY "Arrest.Type",  "Area.Name"')
 ```
 
-```{r echo=FALSE}
+```{r message=FALSE, echo=FALSE, warning=FALSE}
 data2<-sqldf(
 'SELECT  COUNT(*) AS count,"Arrest.Type", "Area.Name"
 FROM Arrest2019
@@ -83,7 +79,7 @@ data3<- cbind(data1,data2$count)
 
 <br>
 
-```{r echo=FALSE}
+```{r message=FALSE, echo=FALSE, warning=FALSE}
 data2010<-sqldf(
 'SELECT  COUNT(*) AS count, "Area.Name", "Date"
 FROM Arrest2010
@@ -95,7 +91,7 @@ FROM Arrest2019
 GROUP BY  "Area.Name"')
 ```
 
-```{r echo=FALSE}
+```{r message=FALSE, echo=FALSE, warning=FALSE}
 text2010=paste( paste("Area: ", data2010$Area.Name, sep=""), paste("Total Count: ", data2010$count, sep=""), sep = "<br>")
 
 text2019=paste( paste("Area: ", data2019$Area.Name, sep=""), paste("Total Count: ", data2019$count, sep=""), sep = "<br>")
@@ -111,11 +107,33 @@ The Barchart shows the total number of arrest cases in each area in 2010 and 201
 
 <br>
 
-## 2. Scatter Plot
+## 2. Map: Distribution of arrested position arrested by Patrol Divisions in central area in 2019
 
 <br>
 
-```{r echo=FALSE}
+```{r message=FALSE, echo=FALSE, warning=FALSE}
+# mapping
+Arrest2010map<-Arrest2010[Arrest2010$LAT>=30 & Arrest2010$LON<=-100,]
+Arrest2019map<-Arrest2019[Arrest2019$LAT>=30 & Arrest2019$LON<=-100,]
+
+central2010 <- Arrest2010map[Arrest2010map$Area.Name=="Central",]
+central2019 <- Arrest2019map[Arrest2019map$Area.Name=="Central",]
+
+leaflet() %>% 
+  addProviderTiles("OpenStreetMap") %>% 
+  addCircles(data=central2010, lat=~LAT,lng=~LON, opacity=1, fillOpacity=0.1, radius=100, color="blue") %>%
+  addCircles(data=central2019, lat=~LAT,lng=~LON, opacity=1, fillOpacity=0.1, radius=100, color="red")
+```
+
+I used the arrest cases in central area for an instance. It clearly shows that distribution of arrested position is more concentrated in 2019(red dots) than that in 2010(blue dots).
+
+<br>
+
+## 3. Scatter plot 
+
+<br>
+
+```{r message=FALSE, echo=FALSE, warning=FALSE}
 fig2<-data3 %>% 
 plot_ly(x = ~Arrest.Type, y = ~avg_Age, 
         color = ~Area.Name, type = "scatter", mode = "markers", 
@@ -136,11 +154,11 @@ The scatter plot shows number of cases and average age of subjects. The size ind
 
 <br>
 
-## 3. Boxplot 
+## 4. Boxplot 
 
 <br>
 
-```{r echo=FALSE}
+```{r message=FALSE, echo=FALSE, warning=FALSE}
 fig3 <- plot_ly(Arrest2019, x = ~Arrest.Type, y = ~Age, color = ~Sex.Code, type = "box")
 fig3 <- fig3 %>% layout(boxmode = "group", title = "Age by sex and arrest type", xaxis=list(title = "Arrest Type"))
 
@@ -151,11 +169,11 @@ The boxplot shows age in different arrest type and sex more clearly. It seems th
 
 <br>
 
-## 4. Histogram
+## 5. Histogram
 
 <br>
 
-```{r echo=FALSE}
+```{r message=FALSE, echo=FALSE, warning=FALSE}
 Dependent<-sqldf(
 'SELECT  Age,"Arrest.Type"
 FROM Arrest2019
@@ -181,7 +199,7 @@ Other<-sqldf(
 FROM Arrest2019
 WHERE "Arrest.Type"="Other"')
 
-fig4 <- plot_ly(alpha = 0.3)
+fig4 <- plot_ly(alpha = 0.2)
 fig4 <- fig4 %>% add_histogram(x = ~Dependent$Age, name="Dependent")
 fig4 <- fig4 %>% add_histogram(x = ~Felony$Age, name="Felony")
 fig4 <- fig4 %>% add_histogram(x = ~Infraction$Age, name="Infraction")
@@ -196,11 +214,11 @@ The histogram shows that the age range are overlap and the age of most subjects 
 
 <br>
 
-## 5. Table
+## 6. Table
 
 <br>
 
-```{r echo=FALSE}
+```{r message=FALSE, echo=FALSE, warning=FALSE}
 data7<-sqldf(
 'SELECT  COUNT(*) AS Cases, "Area.Name", "Arrest.Date", "Arrest.Type","Sex.Code","PartOfDay"
 FROM Arrest2019
